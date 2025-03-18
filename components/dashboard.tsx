@@ -21,10 +21,19 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("Performance Metrics");
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Ensure window is available before accessing localStorage
+    if (typeof window !== "undefined") {
+      const storedToken = localStorage.getItem("token");
+      setToken(storedToken);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("token");
+      if (!token) return; // Only proceed if token is available
       try {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/investment`, // Use Environment Variable
@@ -42,7 +51,7 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [token]);
 
   if (loading)
     return <p className="text-gray-400 text-center">Loading investments...</p>;
