@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@nivo/sankey": "^0.88.0",
     "@supabase/supabase-js": "^2.49.1",
     "autoprefixer": "^10.4.21",
     "axios": "^1.8.3",
