@@ -40,7 +40,7 @@ const SankeyChart: React.FC<SankeyChartProps> = ({ data }) => {
   };
 
   return (
-    <div style={{ width: "100%", height: 500, overflow: "visible" }}>
+    <div className="w-full h-[500px] overflow-visible">
       <ResponsiveContainer>
         <Sankey
           key={`${clickedNode}-${highlightedTargets.join("-")}`}
@@ -101,7 +101,7 @@ const SankeyChart: React.FC<SankeyChartProps> = ({ data }) => {
               </g>
             );
           }}
-          link={{ stroke: "#2d3031" }}
+          link={{ stroke: "white", opacity: 1 }}
         >
           <Tooltip />
         </Sankey>

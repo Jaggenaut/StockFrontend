@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio Dashboard
 
-## Getting Started
+This is a **Portfolio Dashboard** built with **React (Next.js), Tailwind CSS, and Recharts** to visualize sector allocation, stock holdings, and overlap analysis using a **Sankey diagram**.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Portfolio Composition:** Displays sector-wise allocation with a breakdown of stocks in each sector.
+- **Sankey Chart (Overlap Analysis):** Visualizes fund overlaps using Recharts' Sankey component.
+- **Sidebar Navigation:** Switch between different dashboard components.
+- **Responsive UI:** Optimized for different screen sizes using Tailwind CSS.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend:** Next.js, TypeScript, Tailwind CSS, Recharts
+- **State Management:** React useState, useEffect
+- **Backend API:** Data is fetched from `https://stocks-backend-teal.vercel.app/`
+- **Data Fetching:** Axios
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Installation & Setup
 
-## Learn More
+1. **Clone the repository:**
 
-To learn more about Next.js, take a look at the following resources:
+   ```sh
+   git clone https://github.com/your-username/your-repo.git
+   cd your-repo
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Install dependencies:**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```sh
+   npm install
+   ```
 
-## Deploy on Vercel
+3. **Run the development server:**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```sh
+   npm run dev
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Open the project in your browser:**
+
+   ```sh
+   http://localhost:3000
+   ```
+
+## Future Enhancements
+
+- Improve UI styling and animations.
+- Add user authentication and data persistence.
+- Expand visualization options (pie charts, line graphs, etc.).

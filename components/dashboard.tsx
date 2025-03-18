@@ -27,14 +27,12 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       try {
         const response = await axios.get(
-          "https://stocks-backend-teal.vercel.app/investment",
+          `${process.env.NEXT_PUBLIC_API_URL}/investment`, // Use Environment Variable
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setData(response.data);
+        setData(response.data.data);
       } catch (err) {
         console.error(err);
         setError("Failed to fetch investment data.");
@@ -46,8 +44,11 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading)
+    return <p className="text-gray-400 text-center">Loading investments...</p>;
+  if (error) return <p className="text-red-500 text-center">{error}</p>;
+  if (data.length === 0)
+    return <p className="text-gray-400 text-center">No investments found.</p>;
 
   const totalInvestment = data.reduce((sum, item) => sum + item.amount, 0);
   const totalCurrentValue = data.reduce(
@@ -61,21 +62,27 @@ export default function Dashboard() {
     100
   ).toFixed(2);
 
-  const bestScheme = data.reduce((prev, current) =>
-    prev.returns_since_investment > current.returns_since_investment
-      ? prev
-      : current
-  );
+  const bestScheme =
+    data.length > 0
+      ? data.reduce((prev, current) =>
+          prev.returns_since_investment > current.returns_since_investment
+            ? prev
+            : current
+        )
+      : null;
 
-  const worstScheme = data.reduce((prev, current) =>
-    prev.returns_since_investment < current.returns_since_investment
-      ? prev
-      : current
-  );
+  const worstScheme =
+    data.length > 0
+      ? data.reduce((prev, current) =>
+          prev.returns_since_investment < current.returns_since_investment
+            ? prev
+            : current
+        )
+      : null;
 
   return (
-    <div className="w-full p-6 bg-gray-900 text-white min-h-[calc(100vh-60px)]">
-      <h1 className="text-2xl font-bold mb-2">Good morning, Yashna!</h1>
+    <div className="w-full p-6 bg-[#171616] h-[calc(100vh-60px)] text-white overflow-y-scroll min-h-[calc(100vh-60px)]">
+      <h1 className="text-2xl font-bold mb-2">Good morning, Aditya!</h1>
       <p className="mb-6">Evaluate Your Investment Performance</p>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -93,19 +100,23 @@ export default function Dashboard() {
           isPositive={true}
         />
 
-        <Card
-          title="Best Performing Scheme"
-          value={bestScheme.isn}
-          percentage={bestScheme.returns_since_investment}
-          isPositive={bestScheme.returns_since_investment >= 0}
-        />
+        {bestScheme && (
+          <Card
+            title="Best Performing Scheme"
+            value={bestScheme.isn}
+            percentage={bestScheme.returns_since_investment}
+            isPositive={bestScheme.returns_since_investment >= 0}
+          />
+        )}
 
-        <Card
-          title="Worst Performing Scheme"
-          value={worstScheme.isn}
-          percentage={worstScheme.returns_since_investment}
-          isPositive={worstScheme.returns_since_investment >= 0}
-        />
+        {worstScheme && (
+          <Card
+            title="Worst Performing Scheme"
+            value={worstScheme.isn}
+            percentage={worstScheme.returns_since_investment}
+            isPositive={worstScheme.returns_since_investment >= 0}
+          />
+        )}
       </div>
 
       <div className="mt-6">

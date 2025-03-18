@@ -39,18 +39,19 @@ const PortfolioComposition = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCompositionData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Unauthorized: No token found.");
+        setLoading(false);
+        return;
+      }
       try {
-        const [compositionRes, overlapRes] = await Promise.all([
-          axios.get<SectorAllocation[]>(
-            "https://stocks-backend-teal.vercel.app/sector-allocation"
-          ),
-          axios.get<OverlapData>(
-            "https://stocks-backend-teal.vercel.app/overlap"
-          ),
-        ]);
-        setCompositionData(compositionRes.data);
-        setOverlapData(overlapRes.data);
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/sector-allocation`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setCompositionData(response.data.data);
       } catch (err) {
         if (axios.isAxiosError(err)) {
           setError(err.message);
@@ -62,7 +63,32 @@ const PortfolioComposition = () => {
       }
     };
 
-    fetchData();
+    const fetchOverlapData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Unauthorized: No token found.");
+        setLoading(false);
+        return;
+      }
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/overlap`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setOverlapData(response.data.data);
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompositionData();
+    fetchOverlapData();
   }, []);
 
   if (loading) return <div>Loading...</div>;
@@ -71,25 +97,30 @@ const PortfolioComposition = () => {
   return (
     <div className="p-4 space-y-8">
       <h2 className="text-2xl font-bold mb-4">Portfolio Composition</h2>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] grid-wrap gap-4">
         {compositionData.map((item) => (
           <div
             key={item.sector}
-            className="group h-[200px] relative p-4 bg-blue-900 rounded-xl shadow-md flex flex-col justify-between hover:bg-blue-800 transition"
+            className="group h-[200px] min-w-[300px] text-black relative p-4 bg-[#9bb0c7] rounded-xl shadow-md flex flex-col justify-between hover:bg-[#9bb0c7] transition"
           >
-            <div>
-              <h3 className="text-sm text-gray-300">{item.sector}</h3>
+            <div className="text-black">
+              <h3 className="text-sm text-black">{item.sector}</h3>
               <p className="text-md font-semibold">
                 ₹{item.amount.toLocaleString()}
               </p>
             </div>
             <p className="text-2xl font-bold mt-2">{item.percentage}%</p>
 
-            <div className="absolute inset-0 bg-blue-950 p-4 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-4 grid-auto-flow-dense">
+            <div
+              className="absolute inset-0 bg-black rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 
+  grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] 
+  grid-rows-2 
+  gap-1 overflow-hidden text-sm"
+            >
               {item.stocks.map((stock, index) => (
                 <div
                   key={index}
-                  className="bg-blue-900 p-2 rounded-lg flex items-center justify-center w-full h-full"
+                  className="bg-[#718dad] p-4 flex items-center justify-center"
                 >
                   {stock.stock}
                 </div>
@@ -100,7 +131,7 @@ const PortfolioComposition = () => {
       </div>
 
       <h2 className="text-2xl font-bold mt-8 mb-4">Overlap Analysis</h2>
-      <div className="h-[500px] bg-gray-900 p-4 rounded-lg">
+      <div className="h-[500px] bg-[#171616] p-4 rounded-lg">
         {overlapData && <SankeyChart data={overlapData} />}
       </div>
     </div>

@@ -24,7 +24,7 @@ export default function Sidebar({
     }`;
 
   return (
-    <div className="w-64 h-[calc(100vh-60px)] bg-gray-900 text-white p-4 rounded-b-2xl">
+    <div className="w-64 h-[calc(100vh-60px)] bg-[#1b1a1a] text-white p-4 rounded-b-2xl">
       {links.map((link) => (
         <div
           key={link.count}

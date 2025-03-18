@@ -13,23 +13,30 @@ export default function Card({
   isPositive: boolean;
 }) {
   return (
-    <div className="bg-blue-900 p-4 rounded-xl shadow-md">
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="text-sm text-gray-300">{title}</h2>
+    <div className="bg-[#12283f] p-6 rounded-xl  flex flex-col justify-between min-w-[250px]">
+      <div className="flex flex-row">
+        <div className="text-white border-l-2 border-[#88bacc] px-[15px]">
+          {title}
+        </div>
         <div
-          className={`flex items-center text-sm ${
-            isPositive ? "text-green-500" : "text-red-500"
+          className={`flex flex-col items-center text-sm mt-2 ${
+            isPositive ? "text-[#589e63]" : "text-red-500"
           }`}
         >
-          {isPositive ? (
-            <ArrowUpRight size={16} />
-          ) : (
-            <ArrowDownRight size={16} />
-          )}
-          <span>{percentage}%</span>
+          <div className="flex flex-row">
+            {isPositive ? (
+              <ArrowUpRight size={16} />
+            ) : (
+              <ArrowDownRight size={16} />
+            )}
+            <span className="ml-1">{percentage}%</span>
+          </div>
+          <span className="ml-1 text-xs text-[#589e63]">Inception</span>
         </div>
       </div>
-      <p className="text-lg font-semibold">{value}</p>
+      <p className="text-2xl font-semibold text-white px-[15px] mt-2">
+        {value}
+      </p>
     </div>
   );
 }
