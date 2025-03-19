@@ -30,6 +30,12 @@ interface OverlapData {
   links: OverlapLink[];
 }
 
+// Define types for stock details
+interface StockDetails {
+  amount: number;
+  percentage: number;
+}
+
 const PortfolioComposition = () => {
   const [compositionData, setCompositionData] = useState<SectorAllocation[]>(
     []
@@ -47,19 +53,28 @@ const PortfolioComposition = () => {
         return;
       }
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/sector-allocation`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await axios.get<{
+          data: Record<
+            string,
+            {
+              total_investment: number;
+              investment_percentage: number;
+              stocks: Record<string, StockDetails>;
+            }
+          >;
+        }>(`${process.env.NEXT_PUBLIC_API_URL}/sector-allocation`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
+        // Format response data
         const formattedData: SectorAllocation[] = Object.entries(
           response.data.data
-        ).map(([sector, details]: [string, any]) => ({
+        ).map(([sector, details]) => ({
           sector,
           total_investment: details.total_investment,
           investment_percentage: details.investment_percentage,
           stocks: Object.entries(details.stocks).map(
-            ([stockName, stockDetails]: [string, any]) => ({
+            ([stockName, stockDetails]) => ({
               stock: stockName,
               amount: stockDetails.amount,
               percentage: stockDetails.percentage,
@@ -87,10 +102,11 @@ const PortfolioComposition = () => {
         return;
       }
       try {
-        const response = await axios.get(
+        const response = await axios.get<{ data: OverlapData }>(
           `${process.env.NEXT_PUBLIC_API_URL}/overlap`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
+
         setOverlapData(response.data.data);
       } catch (err) {
         if (axios.isAxiosError(err)) {
