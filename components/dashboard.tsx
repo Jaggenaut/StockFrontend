@@ -14,6 +14,9 @@ interface Investment {
   isn: string;
   nav_at_investment: number;
   returns_since_investment: number;
+  mutual_funds: {
+    name: string;
+  };
 }
 
 export default function Dashboard() {
@@ -89,30 +92,32 @@ export default function Dashboard() {
         )
       : null;
 
+  const dailyChange = 0.025;
+
   return (
-    <div className="w-full p-6 bg-[#171616] h-[calc(100vh-60px)] text-white overflow-y-scroll min-h-[calc(100vh-60px)]">
+    <div className="w-full p-6 bg-grey-900  text-white min-h-[calc(100vh-60px)] pb-[60px] ">
       <h1 className="text-2xl font-bold mb-2">Good morning, Aditya!</h1>
       <p className="mb-6">Evaluate Your Investment Performance</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-10">
         <Card
           title="Current Investment Value"
           value={`₹${totalCurrentValue.toLocaleString()}`}
-          percentage={parseFloat(totalReturnsPercentage)}
+          percentage={dailyChange}
           isPositive={parseFloat(totalReturnsPercentage) >= 0}
         />
 
         <Card
           title="Initial Investment Value"
           value={`₹${totalInvestment.toLocaleString()}`}
-          percentage={0}
+          percentage={totalReturnsPercentage}
           isPositive={true}
         />
 
         {bestScheme && (
           <Card
             title="Best Performing Scheme"
-            value={bestScheme.isn}
+            value={bestScheme.mutual_funds.name}
             percentage={bestScheme.returns_since_investment}
             isPositive={bestScheme.returns_since_investment >= 0}
           />
@@ -121,7 +126,7 @@ export default function Dashboard() {
         {worstScheme && (
           <Card
             title="Worst Performing Scheme"
-            value={worstScheme.isn}
+            value={worstScheme.mutual_funds.name}
             percentage={worstScheme.returns_since_investment}
             isPositive={worstScheme.returns_since_investment >= 0}
           />

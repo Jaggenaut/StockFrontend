@@ -20,6 +20,22 @@ interface SankeyChartProps {
   data: SankeyData;
 }
 
+const getColor = (index: number) => {
+  const colors = [
+    "#1f77b4",
+    "#ff7f0e",
+    "#2ca02c",
+    "#d62728",
+    "#9467bd",
+    "#8c564b",
+    "#e377c2",
+    "#7f7f7f",
+    "#bcbd22",
+    "#17becf",
+  ];
+  return colors[index % colors.length];
+};
+
 const SankeyChart: React.FC<SankeyChartProps> = ({ data }) => {
   const [highlightedTargets, setHighlightedTargets] = useState<number[]>([]);
   const [clickedNode, setClickedNode] = useState<number | null>(null);
@@ -53,14 +69,15 @@ const SankeyChart: React.FC<SankeyChartProps> = ({ data }) => {
             const isLeftNode = payload.depth === 0;
             const isHighlighted = highlightedTargets.includes(index);
             const isClicked = clickedNode === index;
+            const nodeColor = getColor(index);
 
             const fillColor = isClicked
-              ? "#ffa500" // Orange for clicked node
+              ? "#ffffff" // Orange for clicked node
               : isHighlighted
-              ? "#ff6347" // Red for target nodes
-              : "#8884d8"; // Default color
+              ? "#ffffff" // Red for highlighted nodes
+              : nodeColor;
 
-            const textX = isLeftNode ? x - 120 : x + width + 20;
+            const textX = isLeftNode ? x - 130 : x + width + 20;
 
             return (
               <g
@@ -79,20 +96,22 @@ const SankeyChart: React.FC<SankeyChartProps> = ({ data }) => {
                 />
                 <foreignObject
                   x={textX}
-                  y={y + height / 2 - 10}
+                  y={y + height / 2 - 28}
                   width={150}
                   height={20}
                   style={{ overflow: "visible" }}
                 >
                   <div
                     style={{
-                      color: "#fff",
+                      backgroundColor: isLeftNode ? nodeColor : "",
                       fontSize: "12px",
                       whiteSpace: "wrap",
                       textOverflow: "ellipsis",
                       overflow: "hidden",
                       textAlign: isLeftNode ? "right" : "left",
-                      width: "100px",
+                      width: "110px",
+                      padding: isLeftNode ? "10px" : "0px",
+                      borderRadius: "5px",
                     }}
                   >
                     {payload.name}

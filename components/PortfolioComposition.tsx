@@ -10,8 +10,8 @@ interface StockAllocation {
 
 interface SectorAllocation {
   sector: string;
-  amount: number;
-  percentage: number;
+  total_investment: number;
+  investment_percentage: number;
   stocks: StockAllocation[];
 }
 
@@ -51,7 +51,23 @@ const PortfolioComposition = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/sector-allocation`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        setCompositionData(response.data.data);
+
+        const formattedData: SectorAllocation[] = Object.entries(
+          response.data.data
+        ).map(([sector, details]: [string, any]) => ({
+          sector,
+          total_investment: details.total_investment,
+          investment_percentage: details.investment_percentage,
+          stocks: Object.entries(details.stocks).map(
+            ([stockName, stockDetails]: [string, any]) => ({
+              stock: stockName,
+              amount: stockDetails.amount,
+              percentage: stockDetails.percentage,
+            })
+          ),
+        }));
+
+        setCompositionData(formattedData);
       } catch (err) {
         if (axios.isAxiosError(err)) {
           setError(err.message);
@@ -96,43 +112,144 @@ const PortfolioComposition = () => {
 
   return (
     <div className="p-4 space-y-8">
-      <h2 className="text-2xl font-bold mb-4">Portfolio Composition</h2>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] grid-wrap gap-4">
-        {compositionData.map((item) => (
-          <div
-            key={item.sector}
-            className="group h-[200px] min-w-[300px] text-black relative p-4 bg-[#9bb0c7] rounded-xl shadow-md flex flex-col justify-between hover:bg-[#9bb0c7] transition"
-          >
-            <div className="text-black">
-              <h3 className="text-sm text-black">{item.sector}</h3>
-              <p className="text-md font-semibold">
-                ₹{item.amount.toLocaleString()}
-              </p>
-            </div>
-            <p className="text-2xl font-bold mt-2">{item.percentage}%</p>
+      <h2 className="text-2xl my-5">Sector Allocation</h2>
+      <div className="grid grid-cols-4 grid-rows-2 gap-4 h-[400px]">
+        {compositionData.map((item, index) => {
+          const numStocks = item.stocks.length;
+          const halfIndex = Math.ceil(numStocks / 2);
+          const upperStocks = item.stocks.slice(0, halfIndex);
+          const lowerStocks = item.stocks.slice(halfIndex);
 
+          let gridClasses = "";
+          if (index === 0 || index === 1) {
+            gridClasses = "col-span-2 row-span-1";
+          } else if (index === 2) {
+            gridClasses = "col-span-3 row-span-1";
+          } else {
+            gridClasses = "col-span-1 row-span-1";
+          }
+
+          return (
             <div
-              className="absolute inset-0 bg-black rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 
-  grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] 
-  grid-rows-2 
-  gap-1 overflow-hidden text-sm"
+              key={item.sector}
+              className={`relative ${gridClasses} group overflow-hidden`}
             >
-              {item.stocks.map((stock, index) => (
-                <div
-                  key={index}
-                  className="bg-[#718dad] p-4 flex items-center justify-center"
-                >
-                  {stock.stock}
+              {/* Sector Box (Becomes Transparent on Hover) */}
+              <div
+                className="absolute inset-0 p-4 text-black bg-[#9bb0c7] rounded-xl shadow-md flex flex-col justify-between 
+                transition-opacity duration-300 opacity-100 group-hover:opacity-0"
+              >
+                <div>
+                  <h3 className="text-sm text-black">{item.sector}</h3>
+                  <p className="text-md font-semibold">
+                    ₹{item.total_investment.toLocaleString()}
+                  </p>
                 </div>
-              ))}
+                <p className="text-2xl font-bold mt-2">
+                  {item.investment_percentage}%
+                </p>
+              </div>
+
+              {/* Stock List (Becomes Visible on Hover) */}
+              {/* Stock List (Becomes Visible on Hover) */}
+              <div
+                className="absolute inset-0 rounded-xl shadow-md flex flex-col gap-1
+  transition-opacity duration-300 opacity-0 group-hover:opacity-100 overflow-hidden "
+              >
+                {item.stocks.length === 1 ? (
+                  <>
+                    <div
+                      key={item.stocks[0].stock}
+                      className="bg-[#c6c4d8] h-full w-full text-sm p-3 flex flex-col justify-between"
+                    >
+                      <div>
+                        <h3 className="text-sm text-black">
+                          {item.stocks[0].stock}
+                        </h3>
+                        <p className="text-md text-black font-semibold">
+                          ₹{item.stocks[0].amount.toLocaleString()}
+                        </p>
+                      </div>
+                      <p className="text-xl text-black font-bold mt-2">
+                        {item.stocks[0].percentage}%
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex h-1/2 justify-center gap-1 w-full">
+                      {upperStocks.map((stock) => (
+                        <div
+                          key={stock.stock}
+                          className="bg-[#c6c4d8] w-full text-sm p-3 flex flex-col justify-between"
+                        >
+                          <div>
+                            <h3 className="text-sm text-black">
+                              {stock.stock}
+                            </h3>
+                            <p className="text-md text-black font-semibold">
+                              ₹{stock.amount.toLocaleString()}
+                            </p>
+                          </div>
+                          <p className="text-xl text-black font-bold mt-2">
+                            {stock.percentage}%
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex h-1/2 justify-center gap-1 w-full">
+                      {lowerStocks.map((stock) => (
+                        <div
+                          key={stock.stock}
+                          className="bg-[#c6c4d8] w-full text-sm p-3 flex flex-col justify-between"
+                        >
+                          <div>
+                            <h3 className="text-sm text-black">
+                              {stock.stock}
+                            </h3>
+                            <p className="text-md text-black font-semibold">
+                              ₹{stock.amount.toLocaleString()}
+                            </p>
+                          </div>
+                          <p className="text-xl text-black font-bold mt-2">
+                            {stock.percentage}%
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      <h2 className="text-2xl font-bold mt-8 mb-4">Overlap Analysis</h2>
-      <div className="h-[500px] bg-[#171616] p-4 rounded-lg">
-        {overlapData && <SankeyChart data={overlapData} />}
+      <div className="bg-[#171616] p-6 rounded-lg">
+        <h2 className="text-2xl mb-4">Overlap Analysis</h2>
+        <div className="text-start text-sm mt-4">
+          <p>
+            Comparing:{" "}
+            <span className="">
+              ICICI Prudential Bluechip Fund, HDFC Top 100 Fund, SBI Bluechip
+              Fund, Axis Bluechip Fund, and Mirae Asset Large Cap Fund
+            </span>
+          </p>
+
+          <ul className="list-none mt-2 space-y-1">
+            <li>
+              • <span className="">9</span> Stocks Overlap across these funds.
+            </li>
+            <li>
+              • <span className="">23%</span> Average Overlap in holdings.
+            </li>
+            <li>• Click on a fund to highlight its associated stocks.</li>
+          </ul>
+        </div>
+
+        <div className="h-[500px] bg-[#171616] p-4 rounded-lg">
+          {overlapData && <SankeyChart data={overlapData} />}
+        </div>
       </div>
     </div>
   );
